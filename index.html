@@ -211,6 +211,14 @@
             margin-top: 5px;
         }
 
+        .source-info {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
         .result-screen p {
             text-align: center;
             font-size: 24px;
@@ -221,6 +229,21 @@
             color: var(--accent-electric);
             font-weight: bold;
             font-size: 48px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(42, 52, 86, 0.5);
+            border-radius: 10px;
+            margin: 20px 0;
+            height: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-electric);
+            border-radius: 10px;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -261,12 +284,16 @@
         <!-- Question Screen -->
         <div id="question-container" class="screen">
             <div class="question-container">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
                 <div class="question-number">Question <span id="current-question-num">1</span> of 50</div>
                 <div class="question-text" id="question-text"></div>
                 <div class="question-text-ar" id="question-text-ar"></div>
                 <div class="options-container" id="options-container"></div>
                 <div class="feedback" id="feedback"></div>
                 <div class="correct-answer-display" id="correct-answer-display"></div>
+                <div class="source-info" id="source-info"></div>
                 <button id="next-btn" class="btn hide">Next</button>
             </div>
         </div>
@@ -276,7 +303,7 @@
             <div class="result-screen">
                 <h2>Quiz Complete!</h2>
                 <p>Your final score is:</p>
-                <p class="final-score"><span id="final-score">0</span> / 50</p>
+                <p class="final-score"><span id="final-score">0</span></p>
                 <button id="restart-btn" class="btn">Back to Menu</button>
             </div>
         </div>
@@ -292,7 +319,9 @@
                     { text_en: "A single computer system", text_ar: "نظام كمبيوتر واحد" },
                     { text_en: "A software application", text_ar: "تطبيق برمجي" },
                     { text_en: "A type of peripheral device", text_ar: "نوع من الأجهزة الطرفية" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 4: 'Computer network connects two or more autonomous computers.'"
             },
             {
                 question_en: "What does LAN stand for in networking?",
@@ -302,7 +331,9 @@
                     { text_en: "Long Area Network", text_ar: "شبكة المنطقة الطويلة" },
                     { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "Large Access Node", text_ar: "عقدة وصول كبيرة" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus) is called LAN (Local Area Network)'"
             },
             {
                 question_en: "Which networking component is responsible for directing data between different networks?",
@@ -312,7 +343,9 @@
                     { text_en: "Switch", text_ar: "مبدل (سويتش)" },
                     { text_en: "Hub", text_ar: "محور (هاب)" },
                     { text_en: "Modem", text_ar: "مودم" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 14: ذكر 'Routers' كأحد أجهزة الربط"
             },
             {
                 question_en: "What does the acronym WAN represent in networking?",
@@ -322,7 +355,9 @@
                     { text_en: "Wireless Area Network", text_ar: "الشبكة المحلية اللاسلكية" },
                     { text_en: "Wide Area Network", text_ar: "شبكة المنطقة الواسعة" },
                     { text_en: "Web Application Node", text_ar: "عقدة تطبيق الويب" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network spread geographically (Country or across Globe) is called WAN (Wide Area Network)'"
             },
             {
                 question_en: "In the OSI model, which layer is responsible for end-to-end communication and logical addressing?",
@@ -332,7 +367,9 @@
                     { text_en: "Data Link Layer", text_ar: "طبقة ربط البيانات" },
                     { text_en: "Transport Layer", text_ar: "طبقة النقل" },
                     { text_en: "Physical Layer", text_ar: "الطبقة المادية" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 2 - الشريحة 10: 'Defines logical addressing so that any endpoint can be identified.' و 'Implements routing of frames (packets) through the network.'"
             },
             {
                 question_en: "What is the purpose of the Data Link Layer in the OSI model?",
@@ -342,7 +379,9 @@
                     { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
                     { text_en: "Flow control", text_ar: "التحكم في التدفق" },
                     { text_en: "Physical specifications", text_ar: "المواصفات المادية" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 2 - الشريحة 9: 'Handle errors by implementing an acknowledgement and retransmission scheme.'"
             },
             {
                 question_en: "Which protocol is commonly used for assigning IP addresses dynamically in a network?",
@@ -352,7 +391,9 @@
                     { text_en: "DHCP", text_ar: "بروتوكول التكوين الديناميكي للمضيف" },
                     { text_en: "ARP", text_ar: "بروتوكول تحليل العنوان" },
                     { text_en: "ICMP", text_ar: "بروتوكول رسائل التحكم في الإنترنت" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 16 (ضمن TCP/IP): DHCP هو البروتوكول المستخدم للتهيئة الآلية لعناوين IP"
             },
             {
                 question_en: "What is the primary purpose of the Transport Layer in the OSI model?",
@@ -362,7 +403,9 @@
                     { text_en: "End-to-end communication", text_ar: "الاتصال من طرف إلى طرف" },
                     { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
                     { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 2 - الشريحة 11: 'Purpose of this layer is to provide a reliable mechanism for the exchange of data... Ensures that the data units are delivered error free... in sequence... no loss or duplication'"
             },
             {
                 question_en: "What is a packet-switched network?",
@@ -372,7 +415,9 @@
                     { text_en: "Data is divided into packets for transmission", text_ar: "يتم تقسيم البيانات إلى حزم للإرسال" },
                     { text_en: "Data is transferred in a point-to-point manner", text_ar: "يتم نقل البيانات بطريقة من نقطة إلى نقطة" },
                     { text_en: "Data is transmitted in a circuit-switched manner", text_ar: "يتم إرسال البيانات بطريقة تبديل الدائرة" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 5 - الشريحة 7: مفهوم 'packet' أو 'frame' هو أساس تقنيات LAN مثل Ethernet"
             },
             {
                 question_en: "How many layers does the OSI model have?",
@@ -382,7 +427,9 @@
                     { text_en: "6", text_ar: "6" },
                     { text_en: "7", text_ar: "7" },
                     { text_en: "8", text_ar: "8" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 2 - الشريحة 6: 'OSI Reference Model: 7 Layers'"
             },
             {
                 question_en: "What does the acronym DNS stand for in networking?",
@@ -392,7 +439,9 @@
                     { text_en: "Domain Name System", text_ar: "نظام أسماء النطاقات" },
                     { text_en: "Data Network Security", text_ar: "أمان شبكة البيانات" },
                     { text_en: "Digital Network Service", text_ar: "خدمة الشبكة الرقمية" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 16: مذكور في طبقة Application في نموذج TCP/IP تحت 'Name management – DNS'"
             },
             {
                 question_en: "Which networking device operates at the Data Link Layer of the OSI model?",
@@ -402,7 +451,9 @@
                     { text_en: "Switch", text_ar: "مبدل (سويتش)" },
                     { text_en: "Hub", text_ar: "محور (هاب)" },
                     { text_en: "Modem", text_ar: "مودم" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 6 - الشريحة 11: 'Switches are Multiport Bridges.' والـ Bridge يعمل في Data Link Layer"
             },
             {
                 question_en: "In networking, what is the purpose of a firewall?",
@@ -412,7 +463,9 @@
                     { text_en: "Provide wireless connectivity", text_ar: "توفير الاتصال اللاسلكي" },
                     { text_en: "Manage IP address assignments", text_ar: "إدارة تعيينات عناوين IP" },
                     { text_en: "Optimize data transfer", text_ar: "تحسين نقل البيانات" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 15 (ضمن الخادم): ذكر 'security' كإحدى خدمات الخادم المركزي"
             },
             {
                 question_en: "What is the function of the Physical Layer in the OSI model?",
@@ -422,7 +475,9 @@
                     { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
                     { text_en: "Bit-level transmission", text_ar: "الإرسال على مستوى البت" },
                     { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 2 - الشريحة 8: 'Defines rules by which bits are passed from one system to another on a physical communication medium.'"
             },
             {
                 question_en: "Which networking protocol is responsible for the delivery of emails over the Internet?",
@@ -432,7 +487,9 @@
                     { text_en: "SMTP", text_ar: "بروتوكول نقل البريد البسيط" },
                     { text_en: "FTP", text_ar: "بروتوكول نقل الملفات" },
                     { text_en: "DNS", text_ar: "نظام أسماء النطاقات" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 16: مذكور في طبقة Application في نموذج TCP/IP تحت 'E-mail – SMTP'"
             },
             {
                 question_en: "What does the acronym LAN represent in networking?",
@@ -442,7 +499,9 @@
                     { text_en: "Local Access Node", text_ar: "عقدة الوصول المحلية" },
                     { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "Logical Address Node", text_ar: "عقدة العنوان المنطقي" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus) is called LAN (Local Area Network)'"
             },
             {
                 question_en: "In networking, what does the term \"bandwidth\" refer to?",
@@ -452,7 +511,9 @@
                     { text_en: "Network security level", text_ar: "مستوى أمان الشبكة" },
                     { text_en: "Maximum device capacity", text_ar: "السعة القصوى للجهاز" },
                     { text_en: "Distance between devices", text_ar: "المسافة بين الأجهزة" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 3 - الشرائح 6, 7, 10-14: تم ذكر 'Speed and throughput' و 'Bandwidth' كمعيار رئيسي في خصائص الكابلات"
             },
             {
                 question_en: "Which networking component connects multiple devices within a local area and operates at Layer 2 of the OSI model?",
@@ -462,7 +523,9 @@
                     { text_en: "Switch", text_ar: "مبدل (سويتش)" },
                     { text_en: "Hub", text_ar: "محور (هاب)" },
                     { text_en: "Modem", text_ar: "مودم" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 6 - الشريحة 11: 'Switches are Multiport Bridges.' والـ Bridge يعمل في Data Link Layer (Layer 2)"
             },
             {
                 question_en: "What is the purpose of the Network Layer in the OSI model?",
@@ -472,7 +535,9 @@
                     { text_en: "End-to-end communication", text_ar: "الاتصال من طرف إلى طرف" },
                     { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
                     { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 2 - الشريحة 10: 'Defines logical addressing so that any endpoint can be identified.'"
             },
             {
                 question_en: "Which networking device operates at the Physical Layer of the OSI model?",
@@ -482,7 +547,9 @@
                     { text_en: "Switch", text_ar: "مبدل (سويتش)" },
                     { text_en: "Hub", text_ar: "محور (هاب)" },
                     { text_en: "Modem", text_ar: "مودم" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 6 - الشريحة 9: 'Hubs are actually multiport repeaters.' و Repeater يعمل في Physical Layer"
             },
             {
                 question_en: "What is the purpose of the application layer in the OSI model?",
@@ -492,7 +559,9 @@
                     { text_en: "Presentation of data", text_ar: "عرض البيانات" },
                     { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
                     { text_en: "Interface with user applications", text_ar: "الواجهة مع تطبيقات المستخدم" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 2 - الشريحة 14: 'Application layer interacts with application programs and is the highest level of OSI model.'"
             },
             {
                 question_en: "What does LAN stand for in networking?",
@@ -502,7 +571,9 @@
                     { text_en: "Long Area Network", text_ar: "شبكة المنطقة الطويلة" },
                     { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "Large Access Node", text_ar: "عقدة وصول كبيرة" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus) is called LAN (Local Area Network)'"
             },
             {
                 question_en: "Which statement best describes a LAN?",
@@ -512,7 +583,9 @@
                     { text_en: "Connects devices within a building or campus", text_ar: "تربط الأجهزة داخل مبنى أو حرم جامعي" },
                     { text_en: "Connects devices across cities", text_ar: "تربط الأجهزة عبر المدن" },
                     { text_en: "Serves as a global network", text_ar: "تعمل كشبكة عالمية" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus) is called LAN'"
             },
             {
                 question_en: "What is the primary characteristic of a WAN?",
@@ -522,7 +595,9 @@
                     { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
                     { text_en: "Connects devices within a city", text_ar: "تربط الأجهزة داخل مدينة واحدة" },
                     { text_en: "Spans a large geographic area", text_ar: "تشمل مساحة جغرافية كبيرة" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 1 - الشريحة 5: 'Network spread geographically (Country or across Globe) is called WAN'"
             },
             {
                 question_en: "Which network type is most suitable for a single organization's multiple locations within a city?",
@@ -532,7 +607,9 @@
                     { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in a City is call MAN (Metropolitan Area Network)'"
             },
             {
                 question_en: "What does PAN stand for in networking?",
@@ -542,7 +619,9 @@
                     { text_en: "Personal Area Network", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "Private Access Network", text_ar: "شبكة الوصول الخاصة" },
                     { text_en: "Primary Area Network", text_ar: "شبكة المنطقة الأساسية" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 3 - الشريحة 23: تم التصنيف تحت 'Indoor : 10 – 50m : BlueTooth, WLAN'"
             },
             {
                 question_en: "In which scenario would a WAN be commonly used?",
@@ -552,7 +631,9 @@
                     { text_en: "Connecting devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
                     { text_en: "Connecting devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" },
                     { text_en: "Connecting devices across different cities", text_ar: "ربط الأجهزة عبر مدن مختلفة" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 1 - الشريحة 5: 'Network spread geographically (Country or across Globe)'"
             },
             {
                 question_en: "What is the main purpose of a MAN?",
@@ -562,7 +643,9 @@
                     { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
                     { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
                     { text_en: "Connect devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in a City is call MAN'"
             },
             {
                 question_en: "Which network type is suitable for a small group of interconnected computers in close proximity, such as in a home or office?",
@@ -572,7 +655,9 @@
                     { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus)'"
             },
             {
                 question_en: "What is the characteristic feature of a PAN?",
@@ -582,7 +667,9 @@
                     { text_en: "Connects devices within a city", text_ar: "تربط الأجهزة داخل مدينة" },
                     { text_en: "Connects devices within a building", text_ar: "تربط الأجهزة داخل مبنى" },
                     { text_en: "Connects devices in close proximity to an individual", text_ar: "تربط الأجهزة القريبة من الفرد" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 3 - الشريحة 23: 'Indoor : 10 – 50m' وهو النطاق الشخصي جدًا حول الفرد"
             },
             {
                 question_en: "Which network type is commonly used to connect devices within a single building or campus?",
@@ -592,7 +679,9 @@
                     { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: 'Network in small geographical Area (Room, Building or a Campus)'"
             },
             {
                 question_en: "In networking, what does the term \"geographical scope\" refer to?",
@@ -602,7 +691,9 @@
                     { text_en: "Distance between devices", text_ar: "المسافة بين الأجهزة" },
                     { text_en: "Number of connected devices", text_ar: "عدد الأجهزة المتصلة" },
                     { text_en: "Network security level", text_ar: "مستوى أمان الشبكة" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: التصنيف الكامل للـ LAN, MAN, WAN مبني على 'المساحة الجغرافية' أو 'Geographical Area'"
             },
             {
                 question_en: "Which network type is typically used for connecting devices in a home environment, such as laptops, smartphones, and smart appliances?",
@@ -612,7 +703,9 @@
                     { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "C" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 5: المنزل هو مثال نموذجي لـ 'Room, Building'"
             },
             {
                 question_en: "What is the primary purpose of a WAN?",
@@ -622,7 +715,9 @@
                     { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
                     { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
                     { text_en: "Connect devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: 'Network spread geographically (Country or across Globe)'"
             },
             {
                 question_en: "Which network type is characterized by high-speed data transfer and low latency, making it suitable for applications like online gaming or video conferencing?",
@@ -632,7 +727,9 @@
                     { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "C" // CORRECTED
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 5: طبيعة الـ LAN ذات النطاق المحدود توفر سرعات عالية وزمن انتقال منخفض مقارنة بـ WAN"
             },
             {
                 question_en: "In which network type is data typically transmitted over long distances using technologies like leased lines or satellite connections?",
@@ -642,7 +739,9 @@
                     { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "C" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 3 - الشريحة 27: 'Satellite Communication' هي تقنية لـ WAN"
             },
             {
                 question_en: "Which network type is most likely to be used for connecting devices within a university campus?",
@@ -652,7 +751,9 @@
                     { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "B" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 5: 'Campus' مذكور صراحةً في تعريف الـ LAN"
             },
             {
                 question_en: "What is the primary advantage of using a WAN over a LAN?",
@@ -662,7 +763,9 @@
                     { text_en: "Lower cost of implementation", text_ar: "تكلفة تنفيذ أقل" },
                     { text_en: "Greater coverage area", text_ar: "منطقة تغطية أكبر" },
                     { text_en: "Simplicity of configuration", text_ar: "بساطة التكوين" }
-                ], correctAnswer: "A" // CORRECTED
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 5: هذا هو الفرق الأساسي بين التعريفين"
             },
             {
                 question_en: "What is the primary purpose of a PAN?",
@@ -672,7 +775,9 @@
                     { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
                     { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
                     { text_en: "Connect devices in close proximity to an individual", text_ar: "ربط الأجهزة القريبة من الفرد" }
-                ], correctAnswer: "A" // CORRECTED
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 3 - الشريحة 23: 'Indoor : 10 – 50m' وهو النطاق الشخصي جدًا حول الفرد"
             },
             {
                 question_en: "Which network type is commonly used to connect devices across different cities or countries?",
@@ -682,7 +787,9 @@
                     { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
                     { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
                     { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
-                ], correctAnswer: "C" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 5: 'Network spread geographically (Country or across Globe)'"
             },
             {
                 question_en: "What is the typical speed of data transfer in a PAN?",
@@ -692,7 +799,9 @@
                     { text_en: "Moderate", text_ar: "متوسطة" },
                     { text_en: "High", text_ar: "عالية" },
                     { text_en: "Extremely high", text_ar: "عالية جدًا" }
-                ], correctAnswer: "A" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 3 - الشريحة 23: مقارنة بتقنيات أخرى مثل Ethernet (Gigabit) أو Wi-Fi، فإن سرعات الـ PAN (مثل Bluetooth) تعتبر منخفضة"
             },
             {
                 question_en: "In which network topology does each device connect to a central hub or switch?",
@@ -702,7 +811,9 @@
                     { text_en: "Ring", text_ar: "حلقة (Ring)" },
                     { text_en: "Star", text_ar: "نجمية (Star)" },
                     { text_en: "Mesh", text_ar: "شبكية (Mesh)" }
-                ], correctAnswer: "C"
+                ], 
+                correctAnswer: "C",
+                source: "المحاضرة 1 - الشريحة 9: 'The star topology is the most commonly used architecture in Ethernet LANs.' وتم توضيحها برسم 'Hub' في الشريحة 10"
             },
             {
                 question_en: "What is the main advantage of a star topology?",
@@ -712,7 +823,9 @@
                     { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
                     { text_en: "Low cost of cabling", text_ar: "تكلفة منخفضة للكابلات" },
                     { text_en: "Improved fault isolation", text_ar: "عزل أفضل للأعطال" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 1 - الشريحة 9: 'When installed, the star topology resembles spokes in a bicycle wheel.' (عطل في أحد الأذرع لا يؤثر على الآخرين)"
             },
             {
                 question_en: "In a bus topology, how are devices connected to the central communication line?",
@@ -722,7 +835,9 @@
                     { text_en: "Through a central hub", text_ar: "عبر محور مركزي" },
                     { text_en: "In a ring configuration", text_ar: "في تكوين حلقي" },
                     { text_en: "Via a mesh network", text_ar: "عبر شبكة شبكية" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 8: 'all the devices on a bus topology are connected by one single cable.'"
             },
             {
                 question_en: "What happens to the data transmitted in a bus topology if two devices send signals simultaneously?",
@@ -732,7 +847,9 @@
                     { text_en: "Data is sent sequentially", text_ar: "يتم إرسال البيانات بشكل متسلسل" },
                     { text_en: "Network becomes more efficient", text_ar: "تصبح الشبكة أكثر كفاءة" },
                     { text_en: "Data is lost", text_ar: "تضيع البيانات" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 5 - الشريحة 4 و5: تم شرح آلية CSMA/CD التي تعالج التصادمات، والتي كانت مستخدمة في Ethernet القديم ذي طوبولوجيا الناقل"
             },
             {
                 question_en: "Which network topology uses a token-passing protocol to control data transmission?",
@@ -742,7 +859,9 @@
                     { text_en: "Ring", text_ar: "حلقة (Ring)" },
                     { text_en: "Star", text_ar: "نجمية (Star)" },
                     { text_en: "Mesh", text_ar: "شبكية (Mesh)" }
-                ], correctAnswer: "B"
+                ], 
+                correctAnswer: "B",
+                source: "المحاضرة 1 - الشريحة 10: 'A frame travels around the ring, stopping at each node.' هذه هي آلية تمرير الرمز (Token Passing)"
             },
             {
                 question_en: "What is the primary disadvantage of a bus topology?",
@@ -752,7 +871,9 @@
                     { text_en: "Limited scalability", text_ar: "قابلية توسع محدودة" },
                     { text_en: "High cost of cabling", text_ar: "تكلفة عالية للكابلات" },
                     { text_en: "Susceptible to collisions", text_ar: "عرضة للتصادمات" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 5 - الشريحة 4 و5: وجود قناة مشتركة واحدة يؤدي إلى التصادمات، وهو السبب الرئيسي لاختفاء هذه الطوبولوجيا"
             },
             {
                 question_en: "In a ring topology, what happens if one device in the ring fails?",
@@ -762,7 +883,9 @@
                     { text_en: "Only the failed device is affected", text_ar: "يتأثر الجهاز الفاشل فقط" },
                     { text_en: "Network continues to function", text_ar: "تستمر الشبكة في العمل" },
                     { text_en: "Data transmission becomes faster", text_ar: "يصبح نقل البيانات أسرع" }
-                ], correctAnswer: "C" // CORRECTED
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 10: في 'Single ring' فشل جهاز أو كابل يعطل الشبكة كاملة"
             },
             {
                 question_en: "What is the main advantage of a ring topology?",
@@ -772,7 +895,9 @@
                     { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
                     { text_en: "Low cost of cabling", text_ar: "تكلفة منخفضة للكابلات" },
                     { text_en: "Equal access to the network", text_ar: "وصول متساوٍ إلى الشبكة" }
-                ], correctAnswer: "D"
+                ], 
+                correctAnswer: "D",
+                source: "المحاضرة 1 - الشريحة 10: آلية تمرير الإطار تضمن وصول كل جهاز للشبكة بشكل منظم وعادل"
             },
             {
                 question_en: "In a star topology, what happens if the central hub or switch fails?",
@@ -782,7 +907,9 @@
                     { text_en: "Only the failed device is affected", text_ar: "يتأثر الجهاز الفاشل فقط" },
                     { text_en: "Network continues to function", text_ar: "تستمر الشبكة في العمل" },
                     { text_en: "Data transmission becomes faster", text_ar: "يصبح نقل البيانات أسرع" }
-                ], correctAnswer: "A"
+                ], 
+                correctAnswer: "A",
+                source: "المحاضرة 1 - الشريحة 9: النقطة المركزية (الـ Hub أو Switch) هي 'نقطة فشل وحيدة'، فإذا تعطلت، ينقطع الاتصال عن جميع الأجهزة المتصلة بها"
             }
         ];
 
@@ -805,9 +932,11 @@
         const optionsContainer = document.getElementById('options-container');
         const feedback = document.getElementById('feedback');
         const correctAnswerDisplay = document.getElementById('correct-answer-display');
+        const sourceInfo = document.getElementById('source-info');
         const scoreDisplayNum = document.getElementById('score');
         const finalScoreDisplay = document.getElementById('final-score');
         const currentQuestionNumDisplay = document.getElementById('current-question-num');
+        const progressBar = document.getElementById('progress-bar');
 
         // Quiz State
         let currentQuizData = [];
@@ -863,6 +992,7 @@
             currentQuestionIndex = 0;
             score = 0;
             updateScore();
+            updateProgressBar();
             showQuestion();
         }
 
@@ -895,12 +1025,15 @@
                 button.addEventListener('click', () => selectAnswer(option.text_en));
                 optionsContainer.appendChild(button);
             });
+            
+            updateProgressBar();
         }
 
         function resetState() {
             feedback.innerText = '';
             feedback.className = 'feedback';
             correctAnswerDisplay.innerText = '';
+            sourceInfo.innerText = '';
             nextBtn.classList.add('hide');
             while (optionsContainer.firstChild) {
                 optionsContainer.removeChild(optionsContainer.firstChild);
@@ -926,6 +1059,12 @@
                 feedback.classList.add('incorrect');
                 event.target.classList.add('incorrect');
                 correctAnswerDisplay.innerText = `The correct answer was: ${correctOptionText}`;
+                
+                // Show source information in training mode
+                if (currentMode === 'training') {
+                    sourceInfo.innerText = `Source: ${currentQuestion.source}`;
+                }
+                
                 optionButtons.forEach(button => {
                     if (button.innerText.includes(correctOptionText)) {
                         button.classList.add('correct');
@@ -943,6 +1082,11 @@
 
         function updateScore() {
             scoreDisplayNum.innerText = score;
+        }
+        
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex) / currentQuizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
 
         function showResult() {
