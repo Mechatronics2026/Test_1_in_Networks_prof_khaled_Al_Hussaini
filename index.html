@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Knowledge Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151b3d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-electric: #00d4ff;
+            --accent-correct: #4caf50;
+            --accent-incorrect: #f44336;
+            --border-color: #2a3456;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--accent-electric);
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: var(--accent-electric);
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 212, 255, 0.1);
+            color: var(--accent-electric);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid var(--accent-electric);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .mode-selection h2, .result-screen h2 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: var(--accent-electric);
+            color: var(--bg-primary);
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            letter-spacing: 1px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background-color: #00a8cc;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        .hide {
+            display: none;
+        }
+
+        .question-container .question-number {
+            color: var(--accent-electric);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-container .question-text {
+            font-size: 20px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .question-container .question-text-ar {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: rgba(42, 52, 86, 0.5);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 15px;
+            font-size: 16px;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-electric);
+            transform: translateX(5px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background-color: var(--accent-correct);
+            border-color: var(--accent-correct);
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--accent-incorrect);
+            border-color: var(--accent-incorrect);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 25px;
+        }
+
+        .feedback.correct {
+            color: var(--accent-correct);
+        }
+
+        .feedback.incorrect {
+            color: var(--accent-incorrect);
+        }
+
+        .correct-answer-display {
+            text-align: center;
+            color: #b0b0b0;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .result-screen p {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .result-screen .final-score {
+            color: var(--accent-electric);
+            font-weight: bold;
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="header">
+            <h1>Networking Fundamentals Quiz</h1>
+        </div>
+        <div class="score-display hide">Score: <span id="score">0</span></div>
+
+        <!-- Mode Selection Screen -->
+        <div id="mode-selection-screen" class="screen active">
+            <div class="mode-selection">
+                <h2>Choose Your Mode</h2>
+                <div class="mode-buttons">
+                    <button id="training-mode-btn" class="btn">Training Mode</button>
+                    <button id="test-mode-btn" class="btn">Test Mode</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Order Selection Screen -->
+        <div id="test-order-screen" class="screen">
+            <div class="mode-selection">
+                <h2>Choose Test Order</h2>
+                <div class="mode-buttons">
+                    <button id="sequential-btn" class="btn">Sequential</button>
+                    <button id="random-btn" class="btn">Random</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="question-container" class="screen">
+            <div class="question-container">
+                <div class="question-number">Question <span id="current-question-num">1</span> of 50</div>
+                <div class="question-text" id="question-text"></div>
+                <div class="question-text-ar" id="question-text-ar"></div>
+                <div class="options-container" id="options-container"></div>
+                <div class="feedback" id="feedback"></div>
+                <div class="correct-answer-display" id="correct-answer-display"></div>
+                <button id="next-btn" class="btn hide">Next</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="result-screen">
+                <h2>Quiz Complete!</h2>
+                <p>Your final score is:</p>
+                <p class="final-score"><span id="final-score">0</span> / 50</p>
+                <button id="restart-btn" class="btn">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const originalQuizData = [
+            {
+                question_en: "What is a network in the context of computing?",
+                question_ar: "ما هي الشبكة في سياق الحوسبة؟",
+                options: [
+                    { text_en: "A group of interconnected computers", text_ar: "مجموعة من أجهزة الكمبيوتر المترابطة" },
+                    { text_en: "A single computer system", text_ar: "نظام كمبيوتر واحد" },
+                    { text_en: "A software application", text_ar: "تطبيق برمجي" },
+                    { text_en: "A type of peripheral device", text_ar: "نوع من الأجهزة الطرفية" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What does LAN stand for in networking?",
+                question_ar: "ماذا يعني اختصار LAN في الشبكات؟",
+                options: [
+                    { text_en: "Local Access Network", text_ar: "شبكة الوصول المحلية" },
+                    { text_en: "Long Area Network", text_ar: "شبكة المنطقة الطويلة" },
+                    { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "Large Access Node", text_ar: "عقدة وصول كبيرة" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "Which networking component is responsible for directing data between different networks?",
+                question_ar: "أي مكون شبكة مسؤول عن توجيه البيانات بين الشبكات المختلفة؟",
+                options: [
+                    { text_en: "Router", text_ar: "جهاز توجيه (راوتر)" },
+                    { text_en: "Switch", text_ar: "مبدل (سويتش)" },
+                    { text_en: "Hub", text_ar: "محور (هاب)" },
+                    { text_en: "Modem", text_ar: "مودم" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What does the acronym WAN represent in networking?",
+                question_ar: "ماذا يمثل اختصار WAN في الشبكات؟",
+                options: [
+                    { text_en: "Wide Access Network", text_ar: "شبكة الوصول الواسعة" },
+                    { text_en: "Wireless Area Network", text_ar: "الشبكة المحلية اللاسلكية" },
+                    { text_en: "Wide Area Network", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "Web Application Node", text_ar: "عقدة تطبيق الويب" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "In the OSI model, which layer is responsible for end-to-end communication and logical addressing?",
+                question_ar: "في نموذج OSI، أي طبقة مسؤولة عن الاتصال من طرف إلى طرف والعنونة المنطقية؟",
+                options: [
+                    { text_en: "Network Layer", text_ar: "طبقة الشبكة" },
+                    { text_en: "Data Link Layer", text_ar: "طبقة ربط البيانات" },
+                    { text_en: "Transport Layer", text_ar: "طبقة النقل" },
+                    { text_en: "Physical Layer", text_ar: "الطبقة المادية" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the purpose of the Data Link Layer in the OSI model?",
+                question_ar: "ما هو الغرض من طبقة ربط البيانات في نموذج OSI؟",
+                options: [
+                    { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
+                    { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
+                    { text_en: "Flow control", text_ar: "التحكم في التدفق" },
+                    { text_en: "Physical specifications", text_ar: "المواصفات المادية" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "Which protocol is commonly used for assigning IP addresses dynamically in a network?",
+                question_ar: "أي بروتوكول يُستخدم بشكل شائع لتعيين عناوين IP ديناميكيًا في الشبكة؟",
+                options: [
+                    { text_en: "DNS", text_ar: "نظام أسماء النطاقات" },
+                    { text_en: "DHCP", text_ar: "بروتوكول التكوين الديناميكي للمضيف" },
+                    { text_en: "ARP", text_ar: "بروتوكول تحليل العنوان" },
+                    { text_en: "ICMP", text_ar: "بروتوكول رسائل التحكم في الإنترنت" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What is the primary purpose of the Transport Layer in the OSI model?",
+                question_ar: "ما هو الغرض الأساسي من طبقة النقل في نموذج OSI؟",
+                options: [
+                    { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
+                    { text_en: "End-to-end communication", text_ar: "الاتصال من طرف إلى طرف" },
+                    { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
+                    { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "What is a packet-switched network?",
+                question_ar: "ما هي الشبكة التي تستخدم تبديل الحزم (packet-switched)؟",
+                options: [
+                    { text_en: "Data is transferred as a continuous stream", text_ar: "يتم نقل البيانات كتدفق مستمر" },
+                    { text_en: "Data is divided into packets for transmission", text_ar: "يتم تقسيم البيانات إلى حزم للإرسال" },
+                    { text_en: "Data is transferred in a point-to-point manner", text_ar: "يتم نقل البيانات بطريقة من نقطة إلى نقطة" },
+                    { text_en: "Data is transmitted in a circuit-switched manner", text_ar: "يتم إرسال البيانات بطريقة تبديل الدائرة" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "How many layers does the OSI model have?",
+                question_ar: "كم طبقة يحتوي عليها نموذج OSI؟",
+                options: [
+                    { text_en: "5", text_ar: "5" },
+                    { text_en: "6", text_ar: "6" },
+                    { text_en: "7", text_ar: "7" },
+                    { text_en: "8", text_ar: "8" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "What does the acronym DNS stand for in networking?",
+                question_ar: "ماذا يعني اختصار DNS في الشبكات؟",
+                options: [
+                    { text_en: "Dynamic Naming Service", text_ar: "خدمة التسمية الديناميكية" },
+                    { text_en: "Domain Name System", text_ar: "نظام أسماء النطاقات" },
+                    { text_en: "Data Network Security", text_ar: "أمان شبكة البيانات" },
+                    { text_en: "Digital Network Service", text_ar: "خدمة الشبكة الرقمية" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "Which networking device operates at the Data Link Layer of the OSI model?",
+                question_ar: "أي جهاز شبكة يعمل في طبقة ربط البيانات في نموذج OSI؟",
+                options: [
+                    { text_en: "Router", text_ar: "جهاز توجيه (راوتر)" },
+                    { text_en: "Switch", text_ar: "مبدل (سويتش)" },
+                    { text_en: "Hub", text_ar: "محور (هاب)" },
+                    { text_en: "Modem", text_ar: "مودم" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "In networking, what is the purpose of a firewall?",
+                question_ar: "في الشبكات، ما هو الغرض من جدار الحماية (firewall)؟",
+                options: [
+                    { text_en: "Control network access", text_ar: "التحكم في الوصول إلى الشبكة" },
+                    { text_en: "Provide wireless connectivity", text_ar: "توفير الاتصال اللاسلكي" },
+                    { text_en: "Manage IP address assignments", text_ar: "إدارة تعيينات عناوين IP" },
+                    { text_en: "Optimize data transfer", text_ar: "تحسين نقل البيانات" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the function of the Physical Layer in the OSI model?",
+                question_ar: "ما هي وظيفة الطبقة المادية في نموذج OSI؟",
+                options: [
+                    { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
+                    { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
+                    { text_en: "Bit-level transmission", text_ar: "الإرسال على مستوى البت" },
+                    { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "Which networking protocol is responsible for the delivery of emails over the Internet?",
+                question_ar: "أي بروتوكول شبكة مسؤول عن تسليم رسائل البريد الإلكتروني عبر الإنترنت؟",
+                options: [
+                    { text_en: "HTTP", text_ar: "بروتوكول نقل النص التشعبي" },
+                    { text_en: "SMTP", text_ar: "بروتوكول نقل البريد البسيط" },
+                    { text_en: "FTP", text_ar: "بروتوكول نقل الملفات" },
+                    { text_en: "DNS", text_ar: "نظام أسماء النطاقات" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What does the acronym LAN represent in networking?",
+                question_ar: "ماذا يمثل اختصار LAN في الشبكات؟",
+                options: [
+                    { text_en: "Large Area Network", text_ar: "شبكة المنطقة الكبيرة" },
+                    { text_en: "Local Access Node", text_ar: "عقدة الوصول المحلية" },
+                    { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "Logical Address Node", text_ar: "عقدة العنوان المنطقي" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "In networking, what does the term \"bandwidth\" refer to?",
+                question_ar: "في الشبكات، إلى ماذا يشير مصطلح \"النطاق الترددي\" (bandwidth)؟",
+                options: [
+                    { text_en: "Data transfer speed", text_ar: "سرعة نقل البيانات" },
+                    { text_en: "Network security level", text_ar: "مستوى أمان الشبكة" },
+                    { text_en: "Maximum device capacity", text_ar: "السعة القصوى للجهاز" },
+                    { text_en: "Distance between devices", text_ar: "المسافة بين الأجهزة" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "Which networking component connects multiple devices within a local area and operates at Layer 2 of the OSI model?",
+                question_ar: "أي مكون شبكة يربط أجهزة متعددة داخل منطقة محلية ويعمل في الطبقة 2 من نموذج OSI؟",
+                options: [
+                    { text_en: "Router", text_ar: "جهاز توجيه (راوتر)" },
+                    { text_en: "Switch", text_ar: "مبدل (سويتش)" },
+                    { text_en: "Hub", text_ar: "محور (هاب)" },
+                    { text_en: "Modem", text_ar: "مودم" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What is the purpose of the Network Layer in the OSI model?",
+                question_ar: "ما هو الغرض من طبقة الشبكة في نموذج OSI؟",
+                options: [
+                    { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
+                    { text_en: "End-to-end communication", text_ar: "الاتصال من طرف إلى طرف" },
+                    { text_en: "Error detection and correction", text_ar: "اكتشاف الأخطاء وتصحيحها" },
+                    { text_en: "Reliable data transfer", text_ar: "نقل البيانات بشكل موثوق" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "Which networking device operates at the Physical Layer of the OSI model?",
+                question_ar: "أي جهاز شبكة يعمل في الطبقة المادية من نموذج OSI؟",
+                options: [
+                    { text_en: "Router", text_ar: "جهاز توجيه (راوتر)" },
+                    { text_en: "Switch", text_ar: "مبدل (سويتش)" },
+                    { text_en: "Hub", text_ar: "محور (هاب)" },
+                    { text_en: "Modem", text_ar: "مودم" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "What is the purpose of the application layer in the OSI model?",
+                question_ar: "ما هو الغرض من طبقة التطبيق في نموذج OSI؟",
+                options: [
+                    { text_en: "End-to-end communication", text_ar: "الاتصال من طرف إلى طرف" },
+                    { text_en: "Presentation of data", text_ar: "عرض البيانات" },
+                    { text_en: "Logical addressing", text_ar: "العنونة المنطقية" },
+                    { text_en: "Interface with user applications", text_ar: "الواجهة مع تطبيقات المستخدم" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "What does LAN stand for in networking?",
+                question_ar: "ماذا يعني اختصار LAN في الشبكات؟",
+                options: [
+                    { text_en: "Local Access Network", text_ar: "شبكة الوصول المحلية" },
+                    { text_en: "Long Area Network", text_ar: "شبكة المنطقة الطويلة" },
+                    { text_en: "Local Area Network", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "Large Access Node", text_ar: "عقدة وصول كبيرة" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "Which statement best describes a LAN?",
+                question_ar: "أي العبارات التالية تصف شبكة المنطقة المحلية (LAN) بشكل أفضل؟",
+                options: [
+                    { text_en: "Spans a large geographical area", text_ar: "تشمل مساحة جغرافية كبيرة" },
+                    { text_en: "Connects devices within a building or campus", text_ar: "تربط الأجهزة داخل مبنى أو حرم جامعي" },
+                    { text_en: "Connects devices across cities", text_ar: "تربط الأجهزة عبر المدن" },
+                    { text_en: "Serves as a global network", text_ar: "تعمل كشبكة عالمية" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What is the primary characteristic of a WAN?",
+                question_ar: "ما هي السمة الأساسية لشبكة المنطقة الواسعة (WAN)؟",
+                options: [
+                    { text_en: "Limited geographic scope", text_ar: "نطاق جغرافي محدود" },
+                    { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
+                    { text_en: "Connects devices within a city", text_ar: "تربط الأجهزة داخل مدينة واحدة" },
+                    { text_en: "Spans a large geographic area", text_ar: "تشمل مساحة جغرافية كبيرة" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "Which network type is most suitable for a single organization's multiple locations within a city?",
+                question_ar: "أي نوع من الشبكات هو الأنسب لمواقع متعددة لمؤسسة واحدة داخل مدينة واحدة؟",
+                options: [
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "What does PAN stand for in networking?",
+                question_ar: "ماذا يعني اختصار PAN في الشبكات؟",
+                options: [
+                    { text_en: "Public Area Network", text_ar: "شبكة المنطقة العامة" },
+                    { text_en: "Personal Area Network", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "Private Access Network", text_ar: "شبكة الوصول الخاصة" },
+                    { text_en: "Primary Area Network", text_ar: "شبكة المنطقة الأساسية" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "In which scenario would a WAN be commonly used?",
+                question_ar: "في أي سيناريو تُستخدم شبكة المنطقة الواسعة (WAN) بشكل شائع؟",
+                options: [
+                    { text_en: "Connecting devices within a building", text_ar: "ربط الأجهزة داخل مبنى" },
+                    { text_en: "Connecting devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
+                    { text_en: "Connecting devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" },
+                    { text_en: "Connecting devices across different cities", text_ar: "ربط الأجهزة عبر مدن مختلفة" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "What is the main purpose of a MAN?",
+                question_ar: "ما هو الغرض الرئيسي من شبكة المنطقة المتوسطة (MAN)؟",
+                options: [
+                    { text_en: "Connect devices within a building", text_ar: "ربط الأجهزة داخل مبنى" },
+                    { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
+                    { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
+                    { text_en: "Connect devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "Which network type is suitable for a small group of interconnected computers in close proximity, such as in a home or office?",
+                question_ar: "أي نوع من الشبكات مناسب لمجموعة صغيرة من أجهزة الكمبيوتر المترابطة في مكان قريب، مثل المنزل أو المكتب؟",
+                options: [
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What is the characteristic feature of a PAN?",
+                question_ar: "ما هي السمة المميزة لشبكة المنطقة الشخصية (PAN)؟",
+                options: [
+                    { text_en: "Spans a large geographical area", text_ar: "تشمل مساحة جغرافية كبيرة" },
+                    { text_en: "Connects devices within a city", text_ar: "تربط الأجهزة داخل مدينة" },
+                    { text_en: "Connects devices within a building", text_ar: "تربط الأجهزة داخل مبنى" },
+                    { text_en: "Connects devices in close proximity to an individual", text_ar: "تربط الأجهزة القريبة من الفرد" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "Which network type is commonly used to connect devices within a single building or campus?",
+                question_ar: "أي نوع من الشبكات يُستخدم بشكل شائع لربط الأجهزة داخل مبنى واحد أو حرم جامعي؟",
+                options: [
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "In networking, what does the term \"geographical scope\" refer to?",
+                question_ar: "في الشبكات، إلى ماذا يشير مصطلح \"النطاق الجغرافي\"؟",
+                options: [
+                    { text_en: "Speed of data transfer", text_ar: "سرعة نقل البيانات" },
+                    { text_en: "Distance between devices", text_ar: "المسافة بين الأجهزة" },
+                    { text_en: "Number of connected devices", text_ar: "عدد الأجهزة المتصلة" },
+                    { text_en: "Network security level", text_ar: "مستوى أمان الشبكة" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "Which network type is typically used for connecting devices in a home environment, such as laptops, smartphones, and smart appliances?",
+                question_ar: "أي نوع من الشبكات يُستخدم عادةً لربط الأجهزة في بيئة منزلية، مثل أجهزة الكمبيوتر المحمولة والهواتف الذكية والأجهزة المنزلية الذكية؟",
+                options: [
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the primary purpose of a WAN?",
+                question_ar: "ما هو الغرض الأساسي من شبكة المنطقة الواسعة (WAN)؟",
+                options: [
+                    { text_en: "Connect devices within a building", text_ar: "ربط الأجهزة داخل مبنى" },
+                    { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
+                    { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
+                    { text_en: "Connect devices within a campus", text_ar: "ربط الأجهزة داخل حرم جامعي" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "Which network type is characterized by high-speed data transfer and low latency, making it suitable for applications like online gaming or video conferencing?",
+                question_ar: "أي نوع من الشبكات يتميز بنقل بيانات عالي السرعة وزمن وصول منخفض، مما يجعله مناسبًا للتطبيقات مثل الألعاب عبر الإنترنت أو مؤتمرات الفيديو؟",
+                options: [
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "In which network type is data typically transmitted over long distances using technologies like leased lines or satellite connections?",
+                question_ar: "في أي نوع من الشبكات يتم إرسال البيانات عادةً لمسافات طويلة باستخدام تقنيات مثل الخطوط المؤجرة أو الاتصالات عبر الأقمار الصناعية؟",
+                options: [
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "Which network type is most likely to be used for connecting devices within a university campus?",
+                question_ar: "أي نوع من الشبكات من المرجح أن يُستخدم لربط الأجهزة داخل حرم جامعي؟",
+                options: [
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the primary advantage of using a WAN over a LAN?",
+                question_ar: "ما هي الميزة الرئيسية لاستخدام شبكة WAN على شبكة LAN؟",
+                options: [
+                    { text_en: "Higher data transfer speed", text_ar: "سرعة نقل بيانات أعلى" },
+                    { text_en: "Lower cost of implementation", text_ar: "تكلفة تنفيذ أقل" },
+                    { text_en: "Greater coverage area", text_ar: "منطقة تغطية أكبر" },
+                    { text_en: "Simplicity of configuration", text_ar: "بساطة التكوين" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "What is the primary purpose of a PAN?",
+                question_ar: "ما هو الغرض الأساسي من شبكة المنطقة الشخصية (PAN)؟",
+                options: [
+                    { text_en: "Connect devices within a building", text_ar: "ربط الأجهزة داخل مبنى" },
+                    { text_en: "Connect devices within a city", text_ar: "ربط الأجهزة داخل مدينة" },
+                    { text_en: "Connect devices globally", text_ar: "ربط الأجهزة عالميًا" },
+                    { text_en: "Connect devices in close proximity to an individual", text_ar: "ربط الأجهزة القريبة من الفرد" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "Which network type is commonly used to connect devices across different cities or countries?",
+                question_ar: "أي نوع من الشبكات يُستخدم بشكل شائع لربط الأجهزة عبر مدن أو دول مختلفة؟",
+                options: [
+                    { text_en: "WAN", text_ar: "شبكة المنطقة الواسعة" },
+                    { text_en: "LAN", text_ar: "شبكة المنطقة المحلية" },
+                    { text_en: "PAN", text_ar: "شبكة المنطقة الشخصية" },
+                    { text_en: "MAN", text_ar: "شبكة المنطقة المتوسطة" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the typical speed of data transfer in a PAN?",
+                question_ar: "ما هي السرعة النموذجية لنقل البيانات في شبكة المنطقة الشخصية (PAN)؟",
+                options: [
+                    { text_en: "Low", text_ar: "منخفضة" },
+                    { text_en: "Moderate", text_ar: "متوسطة" },
+                    { text_en: "High", text_ar: "عالية" },
+                    { text_en: "Extremely high", text_ar: "عالية جدًا" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "In which network topology does each device connect to a central hub or switch?",
+                question_ar: "في أي طوبولوجيا شبكة يتصل كل جهاز بمحور أو مبدل مركزي؟",
+                options: [
+                    { text_en: "Bus", text_ar: "حافلة (Bus)" },
+                    { text_en: "Ring", text_ar: "حلقة (Ring)" },
+                    { text_en: "Star", text_ar: "نجمية (Star)" },
+                    { text_en: "Mesh", text_ar: "شبكية (Mesh)" }
+                ], correctAnswer: "C"
+            },
+            {
+                question_en: "What is the main advantage of a star topology?",
+                question_ar: "ما هي الميزة الرئيسية للطوبولوجيا النجمية؟",
+                options: [
+                    { text_en: "Easy to implement", text_ar: "سهلة التنفيذ" },
+                    { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
+                    { text_en: "Low cost of cabling", text_ar: "تكلفة منخفضة للكابلات" },
+                    { text_en: "Improved fault isolation", text_ar: "عزل أفضل للأعطال" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "In a bus topology, how are devices connected to the central communication line?",
+                question_ar: "في طوبولوجيا الحافلة (Bus)، كيف يتم توصيل الأجهزة بخط الاتصال المركزي؟",
+                options: [
+                    { text_en: "Directly", text_ar: "مباشرة" },
+                    { text_en: "Through a central hub", text_ar: "عبر محور مركزي" },
+                    { text_en: "In a ring configuration", text_ar: "في تكوين حلقي" },
+                    { text_en: "Via a mesh network", text_ar: "عبر شبكة شبكية" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What happens to the data transmitted in a bus topology if two devices send signals simultaneously?",
+                question_ar: "ماذا يحدث للبيانات المرسلة في طوبولوجيا الحافلة (Bus) إذا أرسل جهازان إشارات في نفس الوقت؟",
+                options: [
+                    { text_en: "Collision occurs", text_ar: "يحدث تصادم" },
+                    { text_en: "Data is sent sequentially", text_ar: "يتم إرسال البيانات بشكل متسلسل" },
+                    { text_en: "Network becomes more efficient", text_ar: "تصبح الشبكة أكثر كفاءة" },
+                    { text_en: "Data is lost", text_ar: "تضيع البيانات" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "Which network topology uses a token-passing protocol to control data transmission?",
+                question_ar: "أي طوبولوجيا شبكة تستخدم بروتوكول تمرير الرمز (token-passing) للتحكم في إرسال البيانات؟",
+                options: [
+                    { text_en: "Bus", text_ar: "حافلة (Bus)" },
+                    { text_en: "Ring", text_ar: "حلقة (Ring)" },
+                    { text_en: "Star", text_ar: "نجمية (Star)" },
+                    { text_en: "Mesh", text_ar: "شبكية (Mesh)" }
+                ], correctAnswer: "B"
+            },
+            {
+                question_en: "What is the primary disadvantage of a bus topology?",
+                question_ar: "ما هو العيب الرئيسي لطوبولوجيا الحافلة (Bus)؟",
+                options: [
+                    { text_en: "Difficult to implement", text_ar: "صعبة التنفيذ" },
+                    { text_en: "Limited scalability", text_ar: "قابلية توسع محدودة" },
+                    { text_en: "High cost of cabling", text_ar: "تكلفة عالية للكابلات" },
+                    { text_en: "Susceptible to collisions", text_ar: "عرضة للتصادمات" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "In a ring topology, what happens if one device in the ring fails?",
+                question_ar: "في طوبولوجيا الحلقة (Ring)، ماذا يحدث إذا فشل أحد الأجهزة في الحلقة؟",
+                options: [
+                    { text_en: "All devices fail", text_ar: "تفشل جميع الأجهزة" },
+                    { text_en: "Only the failed device is affected", text_ar: "يتأثر الجهاز الفاشل فقط" },
+                    { text_en: "Network continues to function", text_ar: "تستمر الشبكة في العمل" },
+                    { text_en: "Data transmission becomes faster", text_ar: "يصبح نقل البيانات أسرع" }
+                ], correctAnswer: "A"
+            },
+            {
+                question_en: "What is the main advantage of a ring topology?",
+                question_ar: "ما هي الميزة الرئيسية لطوبولوجيا الحلقة (Ring)؟",
+                options: [
+                    { text_en: "Easy to implement", text_ar: "سهلة التنفيذ" },
+                    { text_en: "High data transfer speed", text_ar: "سرعة عالية لنقل البيانات" },
+                    { text_en: "Low cost of cabling", text_ar: "تكلفة منخفضة للكابلات" },
+                    { text_en: "Equal access to the network", text_ar: "وصول متساوٍ إلى الشبكة" }
+                ], correctAnswer: "D"
+            },
+            {
+                question_en: "In a star topology, what happens if the central hub or switch fails?",
+                question_ar: "في الطوبولوجيا النجمية، ماذا يحدث إذا فشل المحور المركزي أو المبدل؟",
+                options: [
+                    { text_en: "All devices fail", text_ar: "تفشل جميع الأجهزة" },
+                    { text_en: "Only the failed device is affected", text_ar: "يتأثر الجهاز الفاشل فقط" },
+                    { text_en: "Network continues to function", text_ar: "تستمر الشبكة في العمل" },
+                    { text_en: "Data transmission becomes faster", text_ar: "يصبح نقل البيانات أسرع" }
+                ], correctAnswer: "A"
+            }
+        ];
+
+        // DOM Elements
+        const modeSelectionScreen = document.getElementById('mode-selection-screen');
+        const testOrderScreen = document.getElementById('test-order-screen');
+        const questionContainer = document.getElementById('question-container');
+        const resultScreen = document.getElementById('result-screen');
+        const scoreDisplay = document.querySelector('.score-display');
+        
+        const trainingModeBtn = document.getElementById('training-mode-btn');
+        const testModeBtn = document.getElementById('test-mode-btn');
+        const sequentialBtn = document.getElementById('sequential-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        
+        const questionText = document.getElementById('question-text');
+        const questionTextAr = document.getElementById('question-text-ar');
+        const optionsContainer = document.getElementById('options-container');
+        const feedback = document.getElementById('feedback');
+        const correctAnswerDisplay = document.getElementById('correct-answer-display');
+        const scoreDisplayNum = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const currentQuestionNumDisplay = document.getElementById('current-question-num');
+
+        // Quiz State
+        let currentQuizData = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentMode = ''; // 'training' or 'test'
+
+        // Event Listeners
+        trainingModeBtn.addEventListener('click', () => startTrainingMode());
+        testModeBtn.addEventListener('click', () => showTestOrderScreen());
+        sequentialBtn.addEventListener('click', () => startTestMode('sequential'));
+        randomBtn.addEventListener('click', () => startTestMode('random'));
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', backToMenu);
+
+        function shuffleArray(array) {
+            let shuffledArray = [...array];
+            for (let i = shuffledArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+            }
+            return shuffledArray;
+        }
+
+        function showScreen(screenToShow) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            screenToShow.classList.add('active');
+        }
+
+        function showTestOrderScreen() {
+            showScreen(testOrderScreen);
+        }
+
+        function startTrainingMode() {
+            currentMode = 'training';
+            currentQuizData = [...originalQuizData];
+            initializeQuiz();
+        }
+
+        function startTestMode(order) {
+            currentMode = 'test';
+            if (order === 'random') {
+                currentQuizData = shuffleArray(originalQuizData);
+            } else {
+                currentQuizData = [...originalQuizData];
+            }
+            initializeQuiz();
+        }
+        
+        function initializeQuiz() {
+            showScreen(questionContainer);
+            scoreDisplay.classList.remove('hide');
+            currentQuestionIndex = 0;
+            score = 0;
+            updateScore();
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            if (currentQuestionIndex >= currentQuizData.length) {
+                showResult();
+                return;
+            }
+
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            currentQuestionNumDisplay.innerText = currentQuestionIndex + 1;
+            questionText.innerText = currentQuestion.question_en;
+            
+            if (currentMode === 'training') {
+                questionTextAr.innerText = currentQuestion.question_ar;
+                questionTextAr.classList.remove('hide');
+            } else {
+                questionTextAr.classList.add('hide');
+            }
+
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                let buttonText = option.text_en;
+                if (currentMode === 'training') {
+                    buttonText += ` | ${option.text_ar}`;
+                }
+                button.innerText = buttonText;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectAnswer(option.text_en));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            feedback.innerText = '';
+            feedback.className = 'feedback';
+            correctAnswerDisplay.innerText = '';
+            nextBtn.classList.add('hide');
+            while (optionsContainer.firstChild) {
+                optionsContainer.removeChild(optionsContainer.firstChild);
+            }
+        }
+
+        function selectAnswer(selectedOption) {
+            const currentQuestion = currentQuizData[currentQuestionIndex];
+            const correctAnswerLetter = currentQuestion.correctAnswer;
+            const correctOptionText = currentQuestion.options[correctAnswerLetter.charCodeAt(0) - 65].text_en;
+
+            const optionButtons = document.querySelectorAll('.option-btn');
+            optionButtons.forEach(button => button.disabled = true);
+
+            if (selectedOption === correctOptionText) {
+                feedback.innerText = 'Correct! ✅';
+                feedback.classList.add('correct');
+                score++;
+                updateScore();
+                event.target.classList.add('correct');
+            } else {
+                feedback.innerText = 'Incorrect! ❌';
+                feedback.classList.add('incorrect');
+                event.target.classList.add('incorrect');
+                correctAnswerDisplay.innerText = `The correct answer was: ${correctOptionText}`;
+                optionButtons.forEach(button => {
+                    if (button.innerText.includes(correctOptionText)) {
+                        button.classList.add('correct');
+                    }
+                });
+            }
+            
+            nextBtn.classList.remove('hide');
+        }
+        
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function updateScore() {
+            scoreDisplayNum.innerText = score;
+        }
+
+        function showResult() {
+            showScreen(resultScreen);
+            scoreDisplay.classList.add('hide');
+            finalScoreDisplay.innerText = `${score} / ${currentQuizData.length}`;
+        }
+
+        function backToMenu() {
+            showScreen(modeSelectionScreen);
+        }
+    </script>
+</body>
+</html>
